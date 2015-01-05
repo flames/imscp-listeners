@@ -10,7 +10,7 @@ Below, you can find a list of all listener files which are available in that rep
 To install a listener file, you must upload it in your **/etc/imscp/listeners.d** directory, and edit the configuration
 parameters inside it. Once done, you must rerun the i-MSCP installer.
 
-### Listener::Apache2::DualStack
+### Listener::Secondarydns::Zonetransfer
 
 The **listeners.d/15_secondarydns_zonetransfer.pl** listener file provides zone output for zone transfer to secondary DNS.
 
