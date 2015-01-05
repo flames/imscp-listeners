@@ -36,7 +36,7 @@ The **listeners.d/15_secondarydns_zonetransfer.pl** listener file provides zone 
 
 ## Sponsors
 
-- none
+- Nuxwin and i-MSCP team
 
 ## Author
 
