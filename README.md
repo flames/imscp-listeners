@@ -8,7 +8,7 @@ Set of listener files for i-MSCP. These listener files are only compatible with 
 Below, you can find a list of all listener files which are available in that repository, and their respective purpose.
 
 To install a listener file, you must upload it in your **/etc/imscp/listeners.d** directory, and edit the configuration
-parameters inside it. Once done, you must rerun the i-MSCP installer.
+parameters inside it. Once done, you must rerun the i-MSCP installer: **perl /usr/local/src/imscp-1.2.0/imscp-autoinstall -dr named** and add the slave DNS servers
 
 ### Listener::Secondarydns::Zonetransfer
 
