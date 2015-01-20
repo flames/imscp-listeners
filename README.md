@@ -7,9 +7,13 @@ Set of listener files for i-MSCP. These listener files are only compatible with 
 
 Below, you can find a list of all listener files which are available in that repository, and their respective purpose.
 
-### Listener::Secondarydns::Zonetransfer
+### Listener::Named::Zonetransfer
 
-The **listeners.d/15_secondarydns_zonetransfer.pl** listener file provides zone output for zone transfer to secondary DNS.
+The **listeners.d/15_named_zonetransfer.pl** listener file provides zone output for zone transfer to secondary DNS.
+
+### Listener::Named::nameservers
+
+The **listeners.d/15_named_nameservers.pl** listener file modifies the zone files, it removes the default nameservers and adds Your custom out-of-zone nameservers.
 
 To install the listener file, upload it to **/etc/imscp/listeners.d** directory, and edit the configuration
 parameters inside it. Once done, rerun the i-MSCP installer: **perl /usr/local/src/imscp-1.2.0/imscp-autoinstall -dr named** and add the slave DNS servers.
