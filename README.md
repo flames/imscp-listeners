@@ -13,7 +13,7 @@ The **listeners.d/15_named_zonetransfer.pl** listener file provides zone output 
 
 ### Listener::Named::nameservers
 
-The **listeners.d/15_named_nameservers.pl** listener file modifies the zone files, it removes the default nameservers and adds Your custom out-of-zone nameservers.
+The **listeners.d/15_named_nameservers.pl** listener file modifies the zone files, removes default nameservers and adds custom out-of-zone nameservers.
 
 To install the listener file, upload it to **/etc/imscp/listeners.d** directory, and edit the configuration
 parameters inside it. Once done, rerun the i-MSCP installer: **perl /usr/local/src/imscp-1.2.0/imscp-autoinstall -dr named** and add the slave DNS servers.
