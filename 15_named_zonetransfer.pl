@@ -1,4 +1,4 @@
-# i-MSCP Listener::Secondarydns::Zonetransfer listener file
+# i-MSCP Listener::Named::Zonetransfer listener file
 # Copyright (C) 2015 UncleJ, Arthur Mayer <mayer.arthur@gmail.com>
 #
 # This library is free software; you can redistribute it and/or
