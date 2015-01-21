@@ -36,7 +36,7 @@ sub replaceDefaultNameservers
         $$wrkFile =~ s/ns[0-9]\tIN\tA\t([0-9]{1,3}[\.]){3}[0-9]{1,3}\n//g;
         $$wrkFile =~ s/\@\t\tIN\tNS\tns[0-9]\n//g;
 
-        #change your out-of-zone Nameservers
+        #add out-of-zone Nameservers
         foreach my $nameserver(@nameservers) {
                 $$wrkFile .= "@         IN      NS      $nameserver.\n";
         }
