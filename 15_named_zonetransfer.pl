@@ -332,8 +332,8 @@ echo "//CONFIGURATION FOR MAIN DOMAIN\n";
 echo "zone \"$cfg->BASE_SERVER_VHOST\"{\n";
 echo "\ttype slave;\n";
 echo "\tfile \"/var/cache/bind/$cfg->BASE_SERVER_VHOST.db\";\n";
-echo "\tmasters { $cfg->BASE_SERVER_IP; };\n";
-echo "\tallow-notify { $cfg->BASE_SERVER_IP; };\n";
+echo "\tmasters { $cfg->BASE_SERVER_PUBLIC_IP; };\n";
+echo "\tallow-notify { $cfg->BASE_SERVER_PUBLIC_IP; };\n";
 echo "};\n";
 echo "//END CONFIGURATION FOR MAIN DOMAIN\n\n";
 
@@ -343,14 +343,14 @@ if ($rs->rowCount() == 0) {
         echo "//NO DOMAINS LISTED\n";
 } else {
         $records_count = $rs->rowCount();
-        echo "//$records_count HOSTED DOMAINS LISTED ON $cfg->SERVER_HOSTNAME [$cfg->BASE_SERVER_IP]\n";
+        echo "//$records_count HOSTED DOMAINS LISTED ON $cfg->SERVER_HOSTNAME [$cfg->BASE_SERVER_PUBLIC_IP]\n";
 
         while (!$rs->EOF){
                 echo "zone \"".$rs->fields['domain_name']."\"{\n";
                 echo "\ttype slave;\n";
                 echo "\tfile \"/var/cache/bind/".$rs->fields['domain_name'].".db\";\n";
-                echo "\tmasters { $cfg->BASE_SERVER_IP; };\n";
-                echo "\tallow-notify { $cfg->BASE_SERVER_IP; };\n";
+                echo "\tmasters { $cfg->BASE_SERVER_PUBLIC_IP; };\n";
+                echo "\tallow-notify { $cfg->BASE_SERVER_PUBLIC_IP; };\n";
                 echo "};\n";
                 $rs->moveNext();
         }
@@ -364,14 +364,14 @@ if ($rs->rowCount() == 0) {
         echo "//NO ALIASSES LISTED\n";
 } else {
         $records_count = $rs->rowCount();
-        echo "//$records_count HOSTED ALIASSES LISTED ON $cfg->SERVER_HOSTNAME [$cfg->BASE_SERVER_IP]\n";
+        echo "//$records_count HOSTED ALIASSES LISTED ON $cfg->SERVER_HOSTNAME [$cfg->BASE_SERVER_PUBLIC_IP]\n";
 
         while (!$rs->EOF){
                 echo "zone \"".$rs->fields['alias_name']."\"{\n";
                 echo "\ttype slave;\n";
                 echo "\tfile \"/var/cache/bind/".$rs->fields['alias_name'].".db\";\n";
-                echo "\tmasters { $cfg->BASE_SERVER_IP; };\n";
-                echo "\tallow-notify { $cfg->BASE_SERVER_IP; };\n";
+                echo "\tmasters { $cfg->BASE_SERVER_PUBLIC_IP; };\n";
+                echo "\tallow-notify { $cfg->BASE_SERVER_PUBLIC_IP; };\n";
                 echo "};\n";
                 $rs->moveNext();
         }
