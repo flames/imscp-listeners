@@ -9,18 +9,34 @@ Below, you can find a list of all listener files which are available in that rep
 
 ### Listener::Named::Zonetransfer
 
-The **listeners.d/15_named_zonetransfer.pl** listener file provides zone output for zone transfer to secondary DNS.
-
-### Listener::Named::nameservers
-
-The **listeners.d/15_named_nameservers.pl** listener file modifies the zone files, removes default nameservers and adds custom out-of-zone nameservers.
+The **listeners.d/10_named_zonetransfer.pl** listener file provides zone output for zone transfer to secondary DNS.
 
 To install the listener file, upload it to **/etc/imscp/listeners.d** directory, and edit the configuration
-parameters inside it. Once done, rerun the i-MSCP installer: **perl /usr/local/src/imscp-1.2.0/imscp-autoinstall -dr named** and add the slave DNS servers.
+parameters inside it. Once done, rerun the i-MSCP installer: **perl imscp-autoinstall -dr named** and add the slave DNS servers
+
+### Listener::Named::Nameservers
+
+The **listeners.d/10_named_nameservers.pl** listener file modifies the zone files, removes default nameservers and adds custom out-of-zone nameservers.
+
+To install the listener file, upload it to **/etc/imscp/listeners.d** directory, and edit the configuration
+parameters inside it. Once done, rerun the i-MSCP installer: **perl imscp-autoinstall -d**
+
+### Listener::Named::Tuning
+
+The **listeners.d/10_named_tuning.pl** listener file modifies the zone files, removes the default IN A record if a custom IN A record is added by custom DNS for the domain.
+
+To install the listener file, upload it to **/etc/imscp/listeners.d** directory. Once done, rerun the i-MSCP installer: **perl imscp-autoinstall -d**
+
+### Listener::Postfix::Smarthost
+
+The **listeners.d/10_postfix_smarthost.pl** listener file allowing to configure the i-MSCP MTA (Postfix) as smarthost with SASL authentication.
+
+To install the listener file, upload it to **/etc/imscp/listeners.d** directory, and edit the configuration
+parameters inside it. Once done, rerun the i-MSCP installer: **perl imscp-autoinstall -d**
 
 ### License
 
-	Copyright (c) 2015 Arthur Mayer <mayer.arthur@gmail.com>
+	Copyright (c) 2015 Laurent Declercq <l.declercq@nuxwin.com>, Arthur Mayer <mayer.arthur@gmail.com>
 	
 	This library is free software; you can redistribute it and/or
 	modify it under the terms of the GNU Lesser General Public
@@ -38,10 +54,7 @@ parameters inside it. Once done, rerun the i-MSCP installer: **perl /usr/local/s
 
  see [lgpl v2.1](http://www.gnu.org/licenses/lgpl-2.1.txt "lgpl v2.1")
 
-## Sponsors
+## Authors
 
-- Nuxwin and i-MSCP team
-
-## Author
-
+- Laurent Declercq <l.declercq@nuxwin.com>
 - Arthur Mayer <mayer.arthur@gmail.com>

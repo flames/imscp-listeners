@@ -27,22 +27,26 @@ use iMSCP::TemplateParser;
 sub replaceDefaultNameservers
 {
 
-        #Define here your out-of-zone Nameservers
+        # Define here your out-of-zone nameservers
         my @nameservers = ("ns1.mycompany.tld", "ns2.mycompany.tld", "ns3.mycompany.tld");
 
         my ($wrkFile, $data) = @_;
 
-        #remove default Nameservers (NS and A section)
+        # remove default nameservers (IN A and IN NS section)
         $$wrkFile =~ s/ns[0-9]\tIN\tA\t([0-9]{1,3}[\.]){3}[0-9]{1,3}\n//g;
         $$wrkFile =~ s/\@\t\tIN\tNS\tns[0-9]\n//g;
 
-        #add out-of-zone Nameservers
+        # add out-of-zone nameservers
         foreach my $nameserver(@nameservers) {
                 $$wrkFile .= "@         IN      NS      $nameserver.\n";
         }
 
-        #fix SOA record
+        # fix SOA record according new nameservers
         $$wrkFile =~ s/IN\tSOA\tns1\.$data->{'DOMAIN_NAME'}\. postmaster\.$data->{'DOMAIN_NAME'}\./IN\tSOA\t$nameservers[0]\. hostmaster\.$data->{'DOMAIN_NAME'}\./g;
+
+        # allow different mail exchangers in TXT/SPF record
+        $$wrkFile =~ s/~all/a mx ptr ?all/g;
+        $$wrkFile =~ s/-all/a mx ptr ?all/g;
 
         0;
 }
