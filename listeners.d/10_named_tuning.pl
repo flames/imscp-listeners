@@ -1,5 +1,5 @@
-# i-MSCP Listener::Named::Tuning listener file
-# Copyright (C) 2015 Laurent Declercq <l.declercq@nuxwin.com>
+# i-MSCP Listener::Named::Powerdns::Provisioning listener file
+# Copyright (C) 2019 Arthur Mayer <mayer.arthur@gmail.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,37 +16,123 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
 #
-## i-MSCP listener file which allows to remove default @ IN A IP DNS record ( when a custom DNS is set as replacement )
+# Listener file that creates and deltes the zones on your PowerDNS (pdns) nameserver, when they are created/deleted on your i-MSCP server
+# Requires i-MSCP 1.3.8 or newer.
+#
+# Warning: Don't forget to declare your slave DNS servers to i-MSCP.
+# You might need to install the Perl cURL library
+#
+#   apt update && apt install -y libwww-curl-perl
 #
 
-package Listener::Named::Tuning;
+package Listener::Named::Powerdns::Provisioning;
 
+use strict;
+use warnings;
 use iMSCP::EventManager;
+use WWW::Curl::Easy;
+use JSON;
+use POSIX qw/strftime/;
 
-# Remove default domain
-sub beforeNamedAddCustomDNS
-{
-    my ($wrkDbFileContent, $data) = @_;
+my $secretkey = "secret"; # powerdns api key
+my $apiurl = "http://1.1.1.1:8181/api/v1/servers/localhost/zones/"; # powerdns api server url
+my @nameservers = ("ns1.yourcompany.tld.", "ns2.yourcompany.tld."); # your companys nameservers, important, don't forget the trailing dot!
+my $imscpmaster = "2.2.2.2"; # ip of your imscp server, where this listener is installed
+my $logfile = '/var/log/30_named_powerdns_provisioning.log'; # log file path
 
-    if (@{$data->{'DNS_RECORDS'}}) {
-        for(@{$data->{'DNS_RECORDS'}}) {
-            my ($name, $class, $type, $rdata) = @{$_};
+#CREATE ZONE
+iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
+        my ($data) = @_; # Don't forget to effectively get the $data hasref ;)
 
-            if(
-                ($name eq "$data->{'DOMAIN_NAME'}." || $name eq '') &&
-                $class eq 'IN' && $type eq 'A' && $rdata ne $data->{'DOMAIN_IP'}
-            ) {
-                my $match = quotemeta("\@\t\tIN\tA\t$data->{'DOMAIN_IP'}\n");
-                $$wrkDbFileContent =~ s/$match//;
-            }
+        my $ch = WWW::Curl::Easy->new;
+        my $domain = $data->{'DOMAIN_NAME'}; # HOW actually get the customer domain here?
+        my @headers = (
+            "X-API-Key: " . $secretkey
+        );
+        my $body = {
+            "name" => $domain . ".",
+            "kind" => "Slave",
+            "masters" => [
+                $imscpmaster,
+            ],
+            "nameservers" => @nameservers,
+        };
+        my $jsonbody = encode_json $body;
+        my $url = $apiurl;
+
+        $ch->setopt(CURLOPT_URL, $url);
+        $ch->setopt(CURLOPT_HTTPHEADER, \@headers);
+        $ch->setopt(CURLOPT_CUSTOMREQUEST, "POST");
+        $ch->setopt(CURLOPT_POSTFIELDS, $jsonbody);
+
+        my $response_body = '';
+        open (my $fh, ">", \$response_body);
+        $ch->setopt(CURLOPT_WRITEDATA, $fh);
+
+        my $retcode = $ch->perform();
+        if($retcode != 0) {
+            $response_body = 'Error happened: ' . $retcode;
         }
+        my $status = $ch->getinfo(CURLINFO_HTTP_CODE);
+        $fh->close();
+        if($status != 201) {
+            # ERROR handling later, currently don't care about the status code, so far its not 5xx
+            # 201 - created = success
+            # 409 - conflict = already exists (also success for me, except the zone exists already but as master instead of slave, then... fuuu, give a warning, admin has to check manually and solve conflicts, if there are)
+        }
+
+        open(my $log, ">>", $logfile) or die "Could not open file '$logfile' $!";
+        print $log strftime('%Y-%m-%d %H:%M:%S',localtime) . "\n";
+        print $log $jsonbody . "\n" . "Status code: " . $status . "\n" . $response_body . "\n\n";
+        $log->close();
+        #my $json = decode_json($response_body);
+        #my $token = $json->{'access_token'};
+
+        0;
     }
+);
 
-    0;
-}
+#DELETE ZONE
+iMSCP::EventManager->getInstance()->register('afterNamedDelDmn', sub {
+        my ($data) = @_; # Don't forget to effectively get the $data hasref ;)
 
-my $eventManager = iMSCP::EventManager->getInstance();
-$eventManager->register('beforeNamedAddCustomDNS', \&beforeNamedAddCustomDNS);
+        my $ch = WWW::Curl::Easy->new;
+        my $domain = $data->{'DOMAIN_NAME'}; # HOW actually get the customer domain here?
+        my @headers = (
+            "X-API-Key: " . $secretkey
+        );
+        my $url = $apiurl . "/" . $domain . ".";
+
+        $ch->setopt(CURLOPT_URL, $url);
+        $ch->setopt(CURLOPT_HTTPHEADER, \@headers);
+        $ch->setopt(CURLOPT_CUSTOMREQUEST, "POST");
+
+        my $response_body = '';
+        open (my $fh, ">", \$response_body);
+        $ch->setopt(CURLOPT_WRITEDATA, $fh);
+
+        my $retcode = $ch->perform();
+        if($retcode != 0) {
+            $response_body = 'Error happened: ' . $retcode;
+        }
+        my $status = $ch->getinfo(CURLINFO_HTTP_CODE);
+        $fh->close();
+        if($status != 204) {
+            # ERROR handling later, currently don't care about the status code, so far its not 5xx
+            # 204 - no content = success
+            # 404 - not found = already not existent (again, success for me, the point was to remove the zone, so when its already gone now its good, it was probably bad, before we wanted to delete it xD)
+        }
+
+        open(my $log, ">>", $logfile) or die "Could not open file '$logfile' $!";
+        print $log strftime('%Y-%m-%d %H:%M:%S',localtime) . "\n";
+        print $log "Status code: " . $status . "\n" . $response_body . "\n\n";
+        $log->close();
+        #my $json = decode_json($response_body);
+        #my $token = $json->{'access_token'};
+
+        0;
+    }
+);
 
 1;
 __END__
