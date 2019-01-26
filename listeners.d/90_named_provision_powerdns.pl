@@ -14,7 +14,7 @@ my $imscpmaster = "2.2.2.2"; # ip of your imscp server
 #CREATE ZONE
 iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
         my $ch = WWW::Curl::Easy->new;
-        my ($data) = @_; # Don't forget to effectively get the $data hasref ;)
+        my ($data) = @_; # Don't forget to effectively get the $data hashref ;)
         my $domain = $data->{'DOMAIN_NAME'}; # HOW actually get the customer domain here? (see above, thx Nuxwin)
         my @headers = (
             "X-API-Key: " . $secretkey
@@ -60,7 +60,7 @@ iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
 #DELETE ZONE
 iMSCP::EventManager->getInstance()->register('afterNamedDelDmn', sub {
         my $ch = WWW::Curl::Easy->new;
-        my ($data) = @_; # Don't forget to effectively get the $data hasref ;)
+        my ($data) = @_; # Don't forget to effectively get the $data hashref ;)
         my $domain = $data->{'DOMAIN_NAME'}; # HOW actually get the customer domain here? (see above, thx Nuxwin)
         my @headers = (
             "X-API-Key: " . $secretkey
