@@ -1,4 +1,4 @@
-package Listener::Bind9::Localnets;
+package Listener::Named::Powerdns::Provisioning;
 
 use strict;
 use warnings;
@@ -6,14 +6,16 @@ use iMSCP::EventManager;
 use WWW::Curl::Easy;
 use JSON;
 
-my $secretkey = "blarg";
-my $apiurl = "http://127.0.0.1:7171/api/v1/servers/localhost/zones/";
-my $nameservertld = "mycompany.tld";
+my $secretkey = "secret"; # powerdns api key
+my $apiurl = "http://1.1.1.1:8181/api/v1/servers/localhost/zones/"; # powerdns api server url
+my $nameservertld = "yourcompany.tld";
+my $imscpmaster = "2.2.2.2"; # ip of your imscp server
 
 #CREATE ZONE
 iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
         my $ch = WWW::Curl::Easy->new;
-        my $domain = $data->{'DOMAIN_NAME'}; # HOW actually get the customer domain here?
+        my ($data) = @_; # Don't forget to effectively get the $data hasref ;)
+        my $domain = $data->{'DOMAIN_NAME'}; # HOW actually get the customer domain here? (see above, thx Nuxwin)
         my @headers = (
             "X-API-Key: " . $secretkey
         );
@@ -21,7 +23,7 @@ iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
             "name" => $domain . ".",
             "kind" => "Slave",
             "masters" => {
-                "imscp.srv.ip.addr"
+                $imscpmaster
             },
             "nameservers" => {
                 "ns1." . $nameservertld . ".",
@@ -58,7 +60,8 @@ iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
 #DELETE ZONE
 iMSCP::EventManager->getInstance()->register('afterNamedDelDmn', sub {
         my $ch = WWW::Curl::Easy->new;
-        my $domain = $data->{'DOMAIN_NAME'}; # HOW actually get the customer domain here?
+        my ($data) = @_; # Don't forget to effectively get the $data hasref ;)
+        my $domain = $data->{'DOMAIN_NAME'}; # HOW actually get the customer domain here? (see above, thx Nuxwin)
         my @headers = (
             "X-API-Key: " . $secretkey
         );
