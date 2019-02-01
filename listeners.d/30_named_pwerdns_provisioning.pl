@@ -36,7 +36,6 @@ use POSIX qw/strftime/;
 my $secretkey = "secret"; # powerdns api key
 my $apiurl = "http://1.1.1.1:8181/api/v1/servers/localhost/zones/"; # powerdns api server url
 my @nameservers = ("ns1.yourcompany.tld.", "ns2.yourcompany.tld."); # your companys nameservers, important, don't forget the trailing dot!
-my $imscpmaster = "2.2.2.2"; # ip of your imscp server, where this listener is installed
 my $logfile = '/var/log/30_named_powerdns_provisioning.log'; # log file path
 
 #CREATE ZONE
@@ -52,7 +51,7 @@ iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
             "name" => $domain . ".",
             "kind" => "Slave",
             "masters" => [
-                $imscpmaster,
+                $::imscpConfig{'BASE_SERVER_PUBLIC_IP'},
             ],
             "nameservers" => @nameservers,
         };
