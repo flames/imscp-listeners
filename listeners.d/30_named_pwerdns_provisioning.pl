@@ -80,7 +80,7 @@ iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
         }
 
         open(my $log, ">>", $logfile) or die "Could not open file '$logfile' $!";
-        print $log strftime('%Y-%m-%d %H:%M:%S',localtime) . "\n";
+        print $log strftime('%Y-%m-%d %H:%M:%S',localtime) . " " . $domain . "\n";
         print $log $jsonbody . "\n" . "Status code: " . $status . "\n" . $response_body . "\n\n";
         $log->close();
         #my $json = decode_json($response_body);
@@ -122,7 +122,7 @@ iMSCP::EventManager->getInstance()->register('afterNamedDelDmn', sub {
         }
 
         open(my $log, ">>", $logfile) or die "Could not open file '$logfile' $!";
-        print $log strftime('%Y-%m-%d %H:%M:%S',localtime) . "\n";
+        print $log strftime('%Y-%m-%d %H:%M:%S',localtime) . " " . $domain . "\n";
         print $log "Status code: " . $status . "\n" . $response_body . "\n\n";
         $log->close();
         #my $json = decode_json($response_body);
