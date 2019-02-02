@@ -53,7 +53,9 @@ iMSCP::EventManager->getInstance()->register('afterNamedAddDmn', sub {
             "masters" => [
                 $::imscpConfig{'BASE_SERVER_PUBLIC_IP'},
             ],
-            "nameservers" => @nameservers,
+            "nameservers" => [
+                @nameservers
+            ],
         };
         my $jsonbody = encode_json $body;
         my $url = $apiurl;
